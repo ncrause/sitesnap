@@ -14,30 +14,31 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package sitesnap;
+package sitesnap.homepage;
 
-import org.apache.wicket.markup.html.panel.Panel;
-import org.apache.wicket.request.mapper.parameter.PageParameters;
-import sitesnap.homepage.FormPanel;
+import java.util.List;
+import org.apache.wicket.markup.html.form.IChoiceRenderer;
+import org.apache.wicket.model.IModel;
 
 /**
  *
  * @author Nathan Crause <nathan@crause.name>
  */
-public class HomePage extends GeneralPage {
-	
-	public HomePage(PageParameters parameters) {
-		super(parameters);
-		
-		init();
+public class MonitorSizeRenderer implements IChoiceRenderer<MonitorSize> {
+
+	@Override
+	public Object getDisplayValue(MonitorSize object) {
+		return object.humanized();
 	}
 
-	private void init() {
-		add(createForm());
+	@Override
+	public String getIdValue(MonitorSize object, int index) {
+		return MonitorSize.values()[index].name();
 	}
 
-	private Panel createForm() {
-		return new FormPanel("form");
+	@Override
+	public MonitorSize getObject(String id, IModel<? extends List<? extends MonitorSize>> choices) {
+		return MonitorSize.valueOf(id);
 	}
 	
 }

@@ -16,6 +16,7 @@
  */
 package sitesnap.utils;
 
+import java.io.Serializable;
 import lombok.Data;
 
 /**
@@ -23,7 +24,9 @@ import lombok.Data;
  * @author Nathan Crause <nathan@crause.name>
  */
 @Data
-public class Dimension {
+public class Dimension implements Serializable {
+	
+	private static final long serialVersionUID = 889819754762705608L;
 	
 	private final int width;
 	

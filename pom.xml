@@ -112,6 +112,21 @@
 	  <version>1.18.10</version>
 	 </dependency>
 	 <dependency>
+	  <groupId>org.flywaydb</groupId>
+	  <artifactId>flyway-core</artifactId>
+	  <version>6.0.6</version>
+	 </dependency>
+	 <dependency>
+	  <groupId>com.h2database</groupId>
+	  <artifactId>h2</artifactId>
+	  <version>1.4.199</version>
+	 </dependency>
+	 <dependency>
+	  <groupId>org.postgresql</groupId>
+	  <artifactId>postgresql</artifactId>
+	  <version>42.2.8</version>
+	 </dependency>
+	 <dependency>
 	  <groupId>javax</groupId>
 	  <artifactId>javaee-web-api</artifactId>
 	  <version>7.0</version>

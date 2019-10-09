@@ -14,30 +14,42 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package sitesnap;
+package db;
 
-import org.apache.wicket.markup.html.panel.Panel;
-import org.apache.wicket.request.mapper.parameter.PageParameters;
-import sitesnap.homepage.FormPanel;
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.util.function.BiConsumer;
+import org.apache.empire.db.DBDatabase;
 
 /**
  *
  * @author Nathan Crause <nathan@crause.name>
  */
-public class HomePage extends GeneralPage {
+public class Database extends DBDatabase {
 	
-	public HomePage(PageParameters parameters) {
-		super(parameters);
-		
-		init();
+	public final Snaps snaps = new Snaps(this);
+	public final Requests requests = new Requests(this);
+	public final RequestData requestData = new RequestData(this);
+	
+	public Database() {
+		addRelation(requestData.requestId.referenceOn(requests.id));
+		addRelation(requests.snapId.referenceOn(snaps.id));
 	}
+	
+	public static void with(BiConsumer<Database, Connection> func) throws SQLException {
+		Connection c = Connections.get();
+		Database db = Connections.getDatabase();
 
-	private void init() {
-		add(createForm());
-	}
+		db.open(Connections.getDriver(), c);
 
-	private Panel createForm() {
-		return new FormPanel("form");
+		try {
+			func.accept(db, c);
+		}
+		finally {
+			db.close(c);
+
+			c.close();
+		}
 	}
 	
 }

@@ -16,13 +16,22 @@
  */
 package sitesnap;
 
+import db.Database;
 import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.sql.Blob;
+import java.sql.SQLException;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import org.apache.commons.io.output.TeeOutputStream;
+import org.apache.empire.db.DBCommand;
+import org.apache.empire.db.DBRecord;
 import sitesnap.utils.ImageEncoder;
 import sitesnap.utils.PhotographRequest;
 import sitesnap.utils.Photographer;
@@ -39,7 +48,9 @@ import sitesnap.utils.Photographer;
  */
 public class Click extends HttpServlet {
 	
-	public static final String PARAM_NONCE = "nonce".intern();
+	public static final String SESSION_PHOTO_REQUEST = "photo_request".intern();
+	
+	public static final String SESSION_SNAP_ID = "snap_id".intern();
 	
 	/**
 	 * Handles the HTTP <code>GET</code> method.
@@ -52,32 +63,56 @@ public class Click extends HttpServlet {
 	@Override
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
-		String nonce = request.getParameter(PARAM_NONCE);
+//		String nonce = request.getParameter(PARAM_NONCE);
+//		
+//		if (nonce == null) {
+//			response.sendError(HttpServletResponse.SC_EXPECTATION_FAILED, "Missing 'nonce'");
+//			return;
+//		}
 		
-		if (nonce == null) {
-			response.sendError(HttpServletResponse.SC_EXPECTATION_FAILED, "Missing 'nonce'");
-			return;
-		}
-		
-		Map<String, Object> siteParams = (Map) request.getSession().getAttribute(nonce);
+		Map<String, Object> siteParams = (Map) request.getSession().getAttribute(SESSION_PHOTO_REQUEST);
+		long snapId = (Long) request.getSession().getAttribute(SESSION_SNAP_ID);
 		
 		if (siteParams == null) {
-			response.sendError(HttpServletResponse.SC_PRECONDITION_FAILED, "No such 'nonce'");
+			response.sendError(HttpServletResponse.SC_PRECONDITION_FAILED, "No such photo request present");
 			return;
 		}
 		
 		PhotographRequest photoRequest = PhotographRequest.fromMap(siteParams);
 		
 		// remove the session variable right away, so we prevent reload/playback
-		request.getSession().removeAttribute(PARAM_NONCE);
+		request.getSession().removeAttribute(SESSION_PHOTO_REQUEST);
+		request.getSession().removeAttribute(SESSION_SNAP_ID);
 		
 		// Now go get the snapshot!
 		Photographer photographer = new Photographer();
-		BufferedImage image = photographer.click(photoRequest);
-		ImageEncoder encoder = new ImageEncoder();
 		
-		response.setContentType("image/jpeg");
-		response.getOutputStream().write(encoder.toJPG(image));
+		try {
+			BufferedImage image = photographer.click(photoRequest);
+			ImageEncoder encoder = new ImageEncoder();
+
+			response.setContentType("image/jpeg");
+//			response.getOutputStream().write(encoder.toJPG(image));
+			Database.with((db, conn) -> {
+				try {
+					byte[] blob = encoder.toJPG(image);
+					
+					response.getOutputStream().write(blob);
+					
+					DBRecord rec = new DBRecord();
+					
+					rec.read(db.snaps, snapId, conn);
+					rec.setValue(db.snaps.photo, blob);
+					rec.update(conn);
+				}
+				catch(IOException ex) {
+					throw new RuntimeException(ex);
+				}
+			});
+		}
+		catch (InterruptedException | SQLException ex) {
+			throw new ServletException(ex);
+		}
 	}
 	
 	/**

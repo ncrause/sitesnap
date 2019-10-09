@@ -16,6 +16,7 @@
  */
 package sitesnap.utils;
 
+import java.io.Serializable;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Map;
@@ -30,7 +31,9 @@ import lombok.ToString;
  * @author Nathan Crause <nathan@crause.name>
  */
 @ToString
-public class PhotographRequest {
+public class PhotographRequest implements Serializable {
+	
+	private static final long serialVersionUID = 6914297728088688034L;
 	
 	public static final String KEY_URL = "url".intern();
 	
@@ -112,7 +115,7 @@ public class PhotographRequest {
 		if (source.containsKey(KEY_IMAGE_SIZE) 
 				|| (source.containsKey(KEY_IMAGE_WIDTH) 
 						&& source.containsKey(KEY_IMAGE_HEIGHT))) {
-			instance.setMonitorSize(
+			instance.setMaximumBounds(
 					dimensionValueOf((Dimension) source.get(KEY_IMAGE_SIZE), 
 							(Integer) source.get(KEY_IMAGE_WIDTH), 
 							(Integer) source.get(KEY_IMAGE_HEIGHT)));

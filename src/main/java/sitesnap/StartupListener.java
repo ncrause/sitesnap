@@ -16,28 +16,23 @@
  */
 package sitesnap;
 
-import org.apache.wicket.markup.html.panel.Panel;
-import org.apache.wicket.request.mapper.parameter.PageParameters;
-import sitesnap.homepage.FormPanel;
+import javax.servlet.ServletContextEvent;
+import javax.servlet.ServletContextListener;
 
 /**
+ * Web application lifecycle listener which handles database migrations.
  *
  * @author Nathan Crause <nathan@crause.name>
  */
-public class HomePage extends GeneralPage {
-	
-	public HomePage(PageParameters parameters) {
-		super(parameters);
+public class StartupListener implements ServletContextListener {
+
+	@Override
+	public void contextInitialized(ServletContextEvent sce) {
 		
-		init();
 	}
 
-	private void init() {
-		add(createForm());
+	@Override
+	public void contextDestroyed(ServletContextEvent sce) {
+		// We don't need to do anything when shutting down
 	}
-
-	private Panel createForm() {
-		return new FormPanel("form");
-	}
-	
 }

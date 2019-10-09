@@ -16,28 +16,32 @@
  */
 package sitesnap;
 
-import org.apache.wicket.markup.html.panel.Panel;
+import org.apache.wicket.markup.html.WebPage;
+import org.apache.wicket.markup.html.image.Image;
+import org.apache.wicket.markup.html.link.Link;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
-import sitesnap.homepage.FormPanel;
+import org.apache.wicket.request.resource.PackageResourceReference;
 
 /**
+ * Base-class for pages which share the same basic template. It is marked as
+ * abstract because we explicitly don't want to be able to instantiate it
+ * directly.
  *
  * @author Nathan Crause <nathan@crause.name>
  */
-public class HomePage extends GeneralPage {
+public abstract class GeneralPage extends WebPage {
 	
-	public HomePage(PageParameters parameters) {
+	public GeneralPage(final PageParameters parameters) {
 		super(parameters);
 		
-		init();
-	}
-
-	private void init() {
-		add(createForm());
-	}
-
-	private Panel createForm() {
-		return new FormPanel("form");
+		add(new Link("homeURL") {
+			@Override
+			public void onClick() {
+				setResponsePage(HomePage.class);
+			}
+		});
+		add(new Image("wicketLogo", new PackageResourceReference(GeneralPage.class, "Apache-Wicket.svg")));
+		add(new Image("empiredbLogo", new PackageResourceReference(GeneralPage.class, "empiredb.svg")));
 	}
 	
 }

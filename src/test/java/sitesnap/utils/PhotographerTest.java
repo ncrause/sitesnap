@@ -17,9 +17,7 @@
 package sitesnap.utils;
 
 import java.awt.image.BufferedImage;
-import java.io.File;
 import java.net.URL;
-import javax.imageio.ImageIO;
 import org.junit.Test;
 import static org.junit.Assert.*;
 

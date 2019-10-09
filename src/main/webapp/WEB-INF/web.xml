@@ -23,12 +23,24 @@
         <filter-name>wicket.SiteSnap</filter-name>
         <url-pattern>/*</url-pattern>
     </filter-mapping>
+    <listener>
+        <description>ServletContextListener</description>
+        <listener-class>sitesnap.StartupListener</listener-class>
+    </listener>
     <servlet>
         <servlet-name>Click</servlet-name>
         <servlet-class>sitesnap.Click</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>DbConsole</servlet-name>
+        <servlet-class>org.h2.server.web.WebServlet</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>Click</servlet-name>
         <url-pattern>/click</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>DbConsole</servlet-name>
+        <url-pattern>/dbconsole/*</url-pattern>
     </servlet-mapping>
 </web-app>

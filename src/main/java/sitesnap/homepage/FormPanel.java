@@ -14,30 +14,29 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package sitesnap;
+package sitesnap.homepage;
 
+import org.apache.wicket.Component;
 import org.apache.wicket.markup.html.panel.Panel;
-import org.apache.wicket.request.mapper.parameter.PageParameters;
-import sitesnap.homepage.FormPanel;
 
 /**
  *
  * @author Nathan Crause <nathan@crause.name>
  */
-public class HomePage extends GeneralPage {
+public class FormPanel extends Panel {
 	
-	public HomePage(PageParameters parameters) {
-		super(parameters);
+	public FormPanel(String id) {
+		super(id);
 		
 		init();
 	}
-
+	
 	private void init() {
 		add(createForm());
 	}
-
-	private Panel createForm() {
-		return new FormPanel("form");
+	
+	private Component createForm() {
+		return new WebsiteForm("websiteForm");
 	}
 	
 }
