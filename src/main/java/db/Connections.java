@@ -16,10 +16,13 @@
  */
 package db;
 
+import db.beans.ActiveConnection;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
+import java.util.logging.Level;
 import javax.sql.DataSource;
+import lombok.extern.java.Log;
 import org.apache.empire.db.DBDatabaseDriver;
 import org.apache.empire.db.h2.DBDatabaseDriverH2;
 import org.apache.empire.db.postgresql.DBDatabaseDriverPostgreSQL;
@@ -33,7 +36,21 @@ import org.h2.jdbcx.JdbcDataSource;
  *
  * @author Nathan Crause <nathan@crause.name>
  */
+@Log
 public class Connections {
+	
+	public static final ThreadLocal<ActiveConnection> ACTIVE_CONNECTION = new ThreadLocal<ActiveConnection>() {
+		@Override
+		protected ActiveConnection initialValue() {
+			try {
+				return new ActiveConnection();
+			}
+			catch (SQLException ex) {
+				log.log(Level.SEVERE, null, ex);
+				throw new RuntimeException(ex);
+			}
+		}
+	};
 	
 	private static RuntimeConfigurationType configuration;
 	

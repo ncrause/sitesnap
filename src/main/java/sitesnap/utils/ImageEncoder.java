@@ -64,4 +64,12 @@ public class ImageEncoder {
 		return toJPG(image, 60);
 	}
 	
+	public byte[] toPNG(BufferedImage image) throws IOException {
+		ByteArrayOutputStream output = new ByteArrayOutputStream();
+		
+		ImageIO.write(image, "png", output);
+		
+		return output.toByteArray();
+	}
+	
 }

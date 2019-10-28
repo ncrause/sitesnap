@@ -23,24 +23,28 @@
         <filter-name>wicket.SiteSnap</filter-name>
         <url-pattern>/*</url-pattern>
     </filter-mapping>
-    <listener>
-        <description>ServletContextListener</description>
-        <listener-class>sitesnap.StartupListener</listener-class>
-    </listener>
     <servlet>
-        <servlet-name>Click</servlet-name>
-        <servlet-class>sitesnap.Click</servlet-class>
+        <servlet-name>ClickServlet</servlet-name>
+        <servlet-class>sitesnap.ClickServlet</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>DbConsole</servlet-name>
         <servlet-class>org.h2.server.web.WebServlet</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>PhotographServlet</servlet-name>
+        <servlet-class>sitesnap.api.PhotographServlet</servlet-class>
+    </servlet>
     <servlet-mapping>
-        <servlet-name>Click</servlet-name>
+        <servlet-name>ClickServlet</servlet-name>
         <url-pattern>/click</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>DbConsole</servlet-name>
         <url-pattern>/dbconsole/*</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>PhotographServlet</servlet-name>
+        <url-pattern>/api/photograph</url-pattern>
     </servlet-mapping>
 </web-app>

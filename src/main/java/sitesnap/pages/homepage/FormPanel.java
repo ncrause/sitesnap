@@ -14,24 +14,29 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package sitesnap.homepage;
+package sitesnap.pages.homepage;
 
-import java.io.Serializable;
-import lombok.Data;
+import org.apache.wicket.Component;
+import org.apache.wicket.markup.html.panel.Panel;
 
 /**
- * This is a POJO JavaBean containing all the form properties for a website
- * photograph request.
  *
  * @author Nathan Crause <nathan@crause.name>
  */
-@Data
-public class WebsiteRequest implements Serializable {
+public class FormPanel extends Panel {
 	
-	private static final long serialVersionUID = -5574149026661792196L;
+	public FormPanel(String id) {
+		super(id);
+		
+		init();
+	}
 	
-	private String url;
+	private void init() {
+		add(createForm());
+	}
 	
-	private MonitorSize monitorSize;
-
+	private Component createForm() {
+		return new WebsiteForm("websiteForm");
+	}
+	
 }

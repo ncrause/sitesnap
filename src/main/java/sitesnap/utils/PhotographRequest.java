@@ -74,6 +74,17 @@ public class PhotographRequest implements Serializable {
 	}
 	
 	/**
+	 * Tests if this request represents an photograph request which must be
+	 * scaled. This is determined by whether the monitor size and maximum
+	 * bounds differ.
+	 * 
+	 * @return 
+	 */
+	public boolean requiresScaling() {
+		return !getMonitorSize().equals(getMaximumBounds());
+	}
+	
+	/**
 	 * Using this requests monitor size to determine the aspect ratio, this
 	 * method determines the bounds of an image which will be constrained
 	 * within the maximum bounds.

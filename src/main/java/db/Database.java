@@ -30,10 +30,15 @@ public class Database extends DBDatabase {
 	public final Snaps snaps = new Snaps(this);
 	public final Requests requests = new Requests(this);
 	public final RequestData requestData = new RequestData(this);
+	public final ApiUsers apiUsers = new ApiUsers(this);
+	public final Packages packages = new Packages(this);
+	public final Limits limits = new Limits(this);
 	
 	public Database() {
 		addRelation(requestData.requestId.referenceOn(requests.id));
 		addRelation(requests.snapId.referenceOn(snaps.id));
+		addRelation(requests.apiUserId.referenceOn(apiUsers.id));
+		addRelation(limits.packageId.referenceOn(packages.id));
 	}
 	
 	public static void with(BiConsumer<Database, Connection> func) throws SQLException {
@@ -51,5 +56,32 @@ public class Database extends DBDatabase {
 			c.close();
 		}
 	}
+	
+	/**
+	 * Slightly more complex version of <code>with</code>, but this one
+	 * is more specifically tailored to returning values.
+	 * 
+	 * @param <R>
+	 * @param type
+	 * @param func
+	 * @return
+	 * @throws SQLException 
+	 */
+	public static <R> R apply(ConnectionFunction<R> func) throws SQLException {
+		Connection c = Connections.get();
+		Database db = Connections.getDatabase();
+
+		db.open(Connections.getDriver(), c);
+
+		try {
+			return func.apply(db, c);
+		}
+		finally {
+			db.close(c);
+
+			c.close();
+		}
+	}
+	
 	
 }

@@ -14,25 +14,24 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package sitesnap;
+package sitesnap.pages.homepage;
 
-import javax.servlet.ServletContextEvent;
-import javax.servlet.ServletContextListener;
+import java.io.Serializable;
+import lombok.Data;
 
 /**
- * Web application lifecycle listener which handles database migrations.
+ * This is a POJO JavaBean containing all the form properties for a website
+ * photograph request.
  *
  * @author Nathan Crause <nathan@crause.name>
  */
-public class StartupListener implements ServletContextListener {
+@Data
+public class WebsiteRequest implements Serializable {
+	
+	private static final long serialVersionUID = -5574149026661792196L;
+	
+	private String url;
+	
+	private MonitorSize monitorSize;
 
-	@Override
-	public void contextInitialized(ServletContextEvent sce) {
-		
-	}
-
-	@Override
-	public void contextDestroyed(ServletContextEvent sce) {
-		// We don't need to do anything when shutting down
-	}
 }

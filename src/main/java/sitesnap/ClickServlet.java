@@ -18,19 +18,13 @@ package sitesnap;
 
 import db.Database;
 import java.awt.image.BufferedImage;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.sql.Blob;
 import java.sql.SQLException;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import org.apache.commons.io.output.TeeOutputStream;
-import org.apache.empire.db.DBCommand;
 import org.apache.empire.db.DBRecord;
 import sitesnap.utils.ImageEncoder;
 import sitesnap.utils.PhotographRequest;
@@ -46,7 +40,7 @@ import sitesnap.utils.Photographer;
  *
  * @author Nathan Crause <nathan@crause.name>
  */
-public class Click extends HttpServlet {
+public class ClickServlet extends HttpServlet {
 	
 	public static final String SESSION_PHOTO_REQUEST = "photo_request".intern();
 	
@@ -71,7 +65,7 @@ public class Click extends HttpServlet {
 //		}
 		
 		Map<String, Object> siteParams = (Map) request.getSession().getAttribute(SESSION_PHOTO_REQUEST);
-		long snapId = (Long) request.getSession().getAttribute(SESSION_SNAP_ID);
+		Long snapId = (Long) request.getSession().getAttribute(SESSION_SNAP_ID);
 		
 		if (siteParams == null) {
 			response.sendError(HttpServletResponse.SC_PRECONDITION_FAILED, "No such photo request present");

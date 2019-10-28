@@ -16,11 +16,13 @@
  */
 package sitesnap;
 
+import sitesnap.pages.HomePage;
 import org.apache.wicket.markup.html.WebPage;
 import org.apache.wicket.markup.html.image.Image;
 import org.apache.wicket.markup.html.link.Link;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.request.resource.PackageResourceReference;
+import sitesnap.pages.api.UsagePage;
 
 /**
  * Base-class for pages which share the same basic template. It is marked as
@@ -40,6 +42,14 @@ public abstract class GeneralPage extends WebPage {
 				setResponsePage(HomePage.class);
 			}
 		});
+		add(new Link("apiUsageURL") {
+			@Override
+			public void onClick() {
+				setResponsePage(UsagePage.class);
+			}
+		});
+		
+		// footer items
 		add(new Image("wicketLogo", new PackageResourceReference(GeneralPage.class, "Apache-Wicket.svg")));
 		add(new Image("empiredbLogo", new PackageResourceReference(GeneralPage.class, "empiredb.svg")));
 	}

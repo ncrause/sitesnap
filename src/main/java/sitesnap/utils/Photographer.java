@@ -38,7 +38,10 @@ public class Photographer {
 	
 	public BufferedImage click(PhotographRequest request) throws IOException, InterruptedException {
 		BufferedImage monitorView = expose(request);
-		return scale(request, monitorView);
+		// only invoke scaling if it's epxlicitly needed.
+		return request.requiresScaling() 
+				? scale(request, monitorView) 
+				: monitorView;
 	}
 	
 	/**
@@ -54,8 +57,9 @@ public class Photographer {
 				"--height", Integer.toString(request.getMonitorSize().getHeight()),
 				"--format", "png",
 				"--quality", "100",
+				// this breaks on Linux, but is really required for responsive websites to function correctly :'(
 				"--disable-smart-width",
-				"--log-level", "none",
+//				"--log-level", "none",
 				"--quiet",
 				request.getTarget().toExternalForm(),
 				"/dev/stdout");
@@ -75,7 +79,11 @@ public class Photographer {
 		// now we can convert it to an image!
 		ByteArrayInputStream input = new ByteArrayInputStream(output.toByteArray());
 
-		return ImageIO.read(input);
+		// We can't simply return the image as-is because some websites will
+		// ignore the monitor size, and this seems to result in a larger
+		// image than expected. So we actually need to actively clip it.
+//		return ImageIO.read(input);
+		return ImageIO.read(input).getSubimage(0, 0, request.getMonitorSize().getWidth(), request.getMonitorSize().getHeight());
 	}
 
 	/**

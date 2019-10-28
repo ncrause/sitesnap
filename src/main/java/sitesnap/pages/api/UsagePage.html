@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<!--
+Copyright (C) 2019 Nathan Crause <nathan@crause.name>
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+-->
+
+<html>
+	<head>
+		<meta charset="UTF-8">
+	</head>
+	
+	<body>
+		<wicket:extend>
+			<h1>API Usage</h1>
+			
+			<p>
+				SiteSnap provides a free API for invoking website photographs.
+				When invoked, it returns either a lossless PNG file, or a
+				response structure in JSON. You can tell which has been
+				returned by either inspecting the <code>Content-Type</code>
+				header, or by the HTTP status code - <code>200</code> will
+				<strong>always</strong> only be returned if a successful
+				photograph was taken.
+			</p>
+			
+			<h2>Limits</h2>
+			
+			<p>
+				<strong>Please be aware</strong> that these usage limits may be
+				amended from time to time depending on potential misuse/abuse.
+			</p>
+			
+			<p>
+				Each limit below is applied per API key, as well as per IP.
+			</p>
+			
+			<ul>
+				<li><span wicket:id="perMinute">[PER MINUTE]</span> per minute</li>
+				<li><span wicket:id="perHour">[PER HOUR]</span> per hour</li>
+				<li><span wicket:id="perDay">[PER DAY]</span> per 24-hours</li>
+				<li><span wicket:id="perMonth">[PER MONTH]</span> per 30-days</li>
+			</ul>
+			
+			<h2>Making a Call</h2>
+			
+			<h3>Authentication</h3>
+			
+			<p>
+				Each request must be accompanied by an HTTP authorization
+				header: <code>Authorization: Basic bmF0aGFuQGNyYXVzZS5uYW1lOmFwaS1rZXk=</code>
+				where the username is your e-mail address, and the password
+				is your assigned API key.
+			</p>
+			
+			<h3>Errors</h3>
+			
+			<h3>End-Point</h3>
+		</wicket:extend>
+	</body>
+</html>

@@ -16,28 +16,30 @@
  */
 package sitesnap;
 
-import org.apache.wicket.markup.html.panel.Panel;
-import org.apache.wicket.request.mapper.parameter.PageParameters;
-import sitesnap.homepage.FormPanel;
-
 /**
+ * This is just the default "free" limits. Although this data exists in the
+ * "limits" table, it's just easier to quickly reference them here when
+ * rendering the HTML page on the public-facing side.
  *
  * @author Nathan Crause <nathan@crause.name>
  */
-public class HomePage extends GeneralPage {
+public interface ApiLimits {
 	
-	public HomePage(PageParameters parameters) {
-		super(parameters);
-		
-		init();
-	}
-
-	private void init() {
-		add(createForm());
-	}
-
-	private Panel createForm() {
-		return new FormPanel("form");
-	}
+	public static final int PER_MINUTE = 10;
+	
+	/**
+	 * Actually 60 minutes
+	 */
+	public static final int PER_HOUR = 500;
+	
+	/**
+	 * Actually 24 hours
+	 */
+	public static final int PER_DAY = 10000;
+	
+	/**
+	 * Actually 30 days
+	 */
+	public static final int PER_MONTH = 250000;
 	
 }

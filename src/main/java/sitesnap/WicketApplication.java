@@ -1,5 +1,6 @@
 package sitesnap;
 
+import sitesnap.pages.HomePage;
 import org.apache.wicket.markup.html.WebPage;
 import org.apache.wicket.protocol.http.WebApplication;
 import org.flywaydb.core.Flyway;
