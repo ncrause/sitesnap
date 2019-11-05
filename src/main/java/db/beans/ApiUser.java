@@ -17,6 +17,7 @@
 package db.beans;
 
 import db.Database;
+import java.io.IOException;
 import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -52,11 +53,13 @@ public class ApiUser implements Serializable {
 		return getPasswordHash().equalsIgnoreCase(hash);
 	}
 	
-	public Package getPackage() throws SQLException {
+	public Package getPackage() throws SQLException, IOException {
 		return Package.find(packageId);
 	}
 	
-	public static ApiUser find(String emailAddress, Database db, Connection conn) {
+	public static ApiUser find(String emailAddress, ActiveConnection activeConnection) {
+		Database db = activeConnection.getDatabase();
+		Connection conn = activeConnection.getConnection();
 		DBCommand cmd = db.createCommand();
 		DBReader reader = new DBReader();
 
@@ -78,31 +81,10 @@ public class ApiUser implements Serializable {
 		return null;
 	}
 	
-	public static ApiUser find(String emailAddress) throws SQLException {
-////		ThreadLocal<ApiUser> rec = new ThreadLocal<>();
-//		AtomicReference<ApiUser> rec = new AtomicReference<>();
-//		
-//		Database.with((db, conn) -> {
-////			DBCommand cmd = db.createCommand();
-////			DBReader reader = new DBReader();
-////
-////			cmd.select(db.apiUsers.getColumns());
-////			cmd.where(db.apiUsers.emailAddress.is(emailAddress));
-////			reader.open(cmd, conn);
-////			
-////			ArrayList<ApiUser> users = reader.getBeanList(ApiUser.class, 1);
-////			
-////			if (users.size() > 0) {
-////				rec.set(users.get(0));
-////			}
-////			
-////			reader.close();
-//			rec.set(find(emailAddress, db, conn));
-//		});
-//		
-//		return rec.get();
-		
-		return Database.apply((db, conn) -> find(emailAddress, db, conn));
+	public static ApiUser find(String emailAddress) throws SQLException, IOException {
+		try (ActiveConnection activeConnection = new ActiveConnection()) {
+			return find(emailAddress, activeConnection);
+		}
 	}
 	
 }

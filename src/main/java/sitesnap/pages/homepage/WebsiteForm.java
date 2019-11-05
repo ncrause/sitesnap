@@ -17,6 +17,7 @@
 package sitesnap.pages.homepage;
 
 import db.Database;
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Enumeration;
@@ -88,7 +89,7 @@ public class WebsiteForm extends Form {
 			// persist the ID through to "click" so we can actually store the image file
 			session.setAttribute(ClickServlet.SESSION_SNAP_ID, snapId);
 		}
-		catch (SQLException ex) {
+		catch (IOException | SQLException ex) {
 			throw new RuntimeException(ex);
 		}
 		

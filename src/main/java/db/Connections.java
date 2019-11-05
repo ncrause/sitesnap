@@ -17,9 +17,12 @@
 package db;
 
 import db.beans.ActiveConnection;
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.logging.Level;
 import javax.sql.DataSource;
 import lombok.extern.java.Log;
@@ -28,6 +31,8 @@ import org.apache.empire.db.h2.DBDatabaseDriverH2;
 import org.apache.empire.db.postgresql.DBDatabaseDriverPostgreSQL;
 import org.apache.empire.db.sqlserver.DBDatabaseDriverMSSQL;
 import org.apache.wicket.RuntimeConfigurationType;
+import org.flywaydb.core.Flyway;
+import org.flywaydb.core.api.configuration.FluentConfiguration;
 import org.h2.jdbcx.JdbcDataSource;
 
 /**
@@ -49,6 +54,18 @@ public class Connections {
 				log.log(Level.SEVERE, null, ex);
 				throw new RuntimeException(ex);
 			}
+		}
+		
+		@Override
+		public void remove() {
+			// removing the threadlocal should explicitly close the active connection
+			try {
+				get().close();
+			} catch (IOException ex) {
+				log.log(Level.SEVERE, null, ex);
+			}
+			
+			super.remove();
 		}
 	};
 	
@@ -108,6 +125,12 @@ public class Connections {
 	
 	private static Database database;
 	
+	/**
+	 * Is there actually a benefit to doing this? Using a singleton value
+	 * like this means any embedded database query which closes the DB will
+	 * negatively affect any encapsulating query.
+	 * @return 
+	 */
 	public static Database getDatabase() {
 		if (database == null) {
 			database = new Database();
@@ -141,6 +164,32 @@ public class Connections {
 		}
 		
 		return "varchar(255)";
+	}
+	
+	public static void doMigration() throws SQLException {
+		FluentConfiguration config = Flyway.configure();
+		
+		config.dataSource(getDataSource())
+				.placeholders(getPlaceholders());
+		
+		Flyway flyway = config.load();
+		
+		flyway.migrate();
+	}
+	
+	/**
+	 * Builds a Map of default placeholders to be used during migrations
+	 * 
+	 * @return 
+	 */
+	private static Map<String, String> getPlaceholders() throws SQLException {
+		Map<String, String> placeholders = new HashMap<>();
+		
+		placeholders.put("blob_type", getBinaryType());
+		placeholders.put("timestamp_type", getTimestampType());
+		placeholders.put("network_addr_type", getNetworkAddressType());
+		
+		return placeholders;
 	}
 	
 }

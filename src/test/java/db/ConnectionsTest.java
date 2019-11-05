@@ -16,16 +16,10 @@
  */
 package db;
 
-import db.Connections;
-import java.sql.Connection;
 import java.sql.SQLException;
-import javax.sql.DataSource;
-import lombok.SneakyThrows;
-import org.apache.empire.db.DBDatabaseDriver;
 import org.apache.wicket.RuntimeConfigurationType;
 import org.junit.Before;
 import org.junit.Test;
-import static org.junit.Assert.*;
 
 /**
  *

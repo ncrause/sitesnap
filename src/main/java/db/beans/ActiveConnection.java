@@ -32,26 +32,35 @@ import lombok.extern.java.Log;
  * @author Nathan Crause <nathan@crause.name>
  */
 @Log
-public class ActiveConnection implements Closeable {
+public class ActiveConnection implements AutoCloseable {
 	
 	@Getter
-	private Connection connection;
+	private final Connection connection;
 	
 	@Getter
-	private Database database;
+	private final Database database;
 	
 	public ActiveConnection() throws SQLException {
+		log.info("Opening connection");
 		connection = Connections.get();
-		database = Connections.getDatabase();
+		log.info("Acquiring database");
+		database = new Database();
 
+		log.info("Opening database");
 		database.open(Connections.getDriver(), connection);
+		
+		if (!database.isOpen()) {
+			throw new RuntimeException("Unexpectedly unopened database!");
+		}
 	}
 
 	@Override
 	public void close() throws IOException {
+		log.info("Closing database");
 		database.close(connection);
 
 		try {
+			log.info("Closing connection");
 			connection.close();
 		}
 		catch (SQLException ex) {

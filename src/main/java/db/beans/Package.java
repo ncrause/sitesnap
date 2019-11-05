@@ -17,6 +17,7 @@
 package db.beans;
 
 import db.Database;
+import java.io.IOException;
 import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -41,11 +42,13 @@ public class Package implements Serializable {
 	
 	private Timestamp dateCreated;
 	
-	public ArrayList<Limit> getLimits() throws SQLException {
+	public ArrayList<Limit> getLimits() throws SQLException, IOException {
 		return Limit.listByPackage(this);
 	}
 	
-	public static Package find(long id, Database db, Connection conn) {
+	public static Package find(long id, ActiveConnection activeConnection) {
+		Database db = activeConnection.getDatabase();
+		Connection conn = activeConnection.getConnection();
 		DBCommand cmd = db.createCommand();
 		DBReader reader = new DBReader();
 
@@ -67,8 +70,10 @@ public class Package implements Serializable {
 		return null;
 	}
 	
-	public static Package find(long id) throws SQLException {
-		return Database.apply((db, conn) -> find(id, db, conn));
+	public static Package find(long id) throws SQLException, IOException {
+		try (ActiveConnection activeConnection = new ActiveConnection()) {
+			return find(id, activeConnection);
+		}
 	}
 	
 }

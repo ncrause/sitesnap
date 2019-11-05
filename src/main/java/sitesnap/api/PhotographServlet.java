@@ -16,25 +16,24 @@
  */
 package sitesnap.api;
 
-import db.Database;
 import db.beans.ApiUser;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.logging.Level;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import lombok.extern.java.Log;
-import org.apache.empire.db.DBCommand;
-import org.apache.empire.db.DBReader;
 import sitesnap.beans.ApiPhotographRequest;
 import sitesnap.beans.Login;
 import sitesnap.utils.ImageEncoder;
+import sitesnap.utils.LimitsExceededException;
 import sitesnap.utils.Photographer;
+import sitesnap.utils.SnapRequestRecorder;
+import sitesnap.utils.UsageValidator;
 
 /**
  *
@@ -92,6 +91,20 @@ public class PhotographServlet extends HttpServlet {
 			return;
 		}
 		
+		UsageValidator usageValidator = new UsageValidator(user, request);
+		
+		try {
+			usageValidator.validate();
+		}
+		catch (LimitsExceededException ex) {
+			log.log(Level.SEVERE, "Usage limits exceeded", ex);
+			response.sendError(HttpServletResponse.SC_FORBIDDEN);
+			return;
+		} 
+		catch (SQLException ex) {
+			throw new ServletException(ex);
+		}
+		
 		ApiPhotographRequest apiRequest;
 		
 		try {
@@ -120,41 +133,21 @@ public class PhotographServlet extends HttpServlet {
 		
 		ImageEncoder encoder = new ImageEncoder();
 		byte[] bytes = encoder.toPNG(image);
+		SnapRequestRecorder recorder = new SnapRequestRecorder(apiRequest.getUrl().toExternalForm(), "api");
+		
+		recorder.setUser(user);
+		recorder.setPhoto(bytes);
+		
+		try {
+			recorder.writeSnap(request);
+		} 
+		catch (SQLException ex) {
+			throw new ServletException(ex);
+		}
 		
 		response.setContentType("image/png");
 		response.getOutputStream().write(bytes);
-			
-//		response.setContentType("text/plain");
-//		try (PrintWriter out = response.getWriter()) {
-//			out.println("Context path:");
-//			out.println(request.getContextPath());
-//			out.println("User:");
-//			out.println(String.valueOf(login));
-//		}
 	}
-	
-//	private ApiUser findUser(String emailAddress) throws SQLException {
-//		ThreadLocal<ApiUser> rec = new ThreadLocal<>();
-//		
-//		Database.with((db, conn) -> {
-//			DBCommand cmd = db.createCommand();
-//			DBReader reader = new DBReader();
-//
-//			cmd.select(db.apiUsers.getColumns());
-//			cmd.where(db.apiUsers.emailAddress.is(emailAddress));
-//			reader.open(cmd, conn);
-//			
-//			ArrayList<ApiUser> users = reader.getBeanList(ApiUser.class, 1);
-//			
-//			if (users.size() > 0) {
-//				rec.set(users.get(0));
-//			}
-//			
-//			reader.close();
-//		});
-//		
-//		return rec.get();
-//	}
 
 	// <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
 	/**

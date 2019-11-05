@@ -17,8 +17,10 @@
 package sitesnap;
 
 import db.Database;
+import db.beans.ActiveConnection;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Map;
 import javax.servlet.ServletException;
@@ -87,22 +89,19 @@ public class ClickServlet extends HttpServlet {
 
 			response.setContentType("image/jpeg");
 //			response.getOutputStream().write(encoder.toJPG(image));
-			Database.with((db, conn) -> {
-				try {
-					byte[] blob = encoder.toJPG(image);
-					
-					response.getOutputStream().write(blob);
-					
-					DBRecord rec = new DBRecord();
-					
-					rec.read(db.snaps, snapId, conn);
-					rec.setValue(db.snaps.photo, blob);
-					rec.update(conn);
-				}
-				catch(IOException ex) {
-					throw new RuntimeException(ex);
-				}
-			});
+			try (ActiveConnection activeConnection = new ActiveConnection()) {
+				Database db = activeConnection.getDatabase();
+				Connection conn = activeConnection.getConnection();
+				byte[] blob = encoder.toJPG(image);
+
+				response.getOutputStream().write(blob);
+
+				DBRecord rec = new DBRecord();
+
+				rec.read(db.snaps, snapId, conn);
+				rec.setValue(db.snaps.photo, blob);
+				rec.update(conn);
+			};
 		}
 		catch (InterruptedException | SQLException ex) {
 			throw new ServletException(ex);

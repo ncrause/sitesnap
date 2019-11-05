@@ -17,6 +17,7 @@
 package db.beans;
 
 import db.Database;
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Timestamp;
@@ -82,7 +83,9 @@ public class Limit {
 		return new Timestamp(cal.getTimeInMillis());
 	}
 	
-	public static ArrayList<Limit> listByPackage(Package pkg, Database db, Connection conn) {
+	public static ArrayList<Limit> listByPackage(Package pkg, ActiveConnection activeConnection) {
+		Database db = activeConnection.getDatabase();
+		Connection conn = activeConnection.getConnection();
 		DBCommand cmd = db.createCommand();
 		DBReader reader = new DBReader();
 
@@ -91,15 +94,18 @@ public class Limit {
 		reader.open(cmd, conn);
 
 		try {
-			return reader.getBeanList(Limit.class, 1);
+			return reader.getBeanList(Limit.class);
 		}
 		finally {
 			reader.close();
 		}
 	}
 	
-	public static ArrayList<Limit> listByPackage(Package pkg) throws SQLException {
-		return Database.apply((db, conn) -> listByPackage(pkg, db, conn));
+	public static ArrayList<Limit> listByPackage(Package pkg) 
+			throws SQLException, IOException {
+		try (ActiveConnection activeConnection = new ActiveConnection()) {
+			return listByPackage(pkg, activeConnection);
+		}
 	}
 	
 }

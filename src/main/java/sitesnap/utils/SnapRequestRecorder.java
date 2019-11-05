@@ -17,7 +17,9 @@
 package sitesnap.utils;
 
 import db.Database;
+import db.beans.ActiveConnection;
 import db.beans.ApiUser;
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Enumeration;
@@ -47,25 +49,37 @@ public class SnapRequestRecorder {
 	@Getter @Setter
 	private ApiUser user;
 	
-	public long writeSnap(HttpServletRequest request) throws SQLException {
-		// TODO: Test if this can be changed to AtomicReference instead
-//		ThreadLocal<Long> snapId = new ThreadLocal<>();
+	@Getter @Setter
+	private byte[] photo;
+	
+	public long writeSnap(HttpServletRequest request, ActiveConnection activeConnection) 
+			throws SQLException {
+		Database db = activeConnection.getDatabase();
+		Connection conn = activeConnection.getConnection();
 		AtomicLong snapId = new AtomicLong();
+		DBRecord rec = new DBRecord();
+
+		rec.create(db.snaps);
+		rec.setValue(db.snaps.targetUrl, url);
+		rec.setValue(db.snaps.via, via);
 		
-		Database.with((db, conn) -> {
-			DBRecord rec = new DBRecord();
-			
-			rec.create(db.snaps);
-			rec.setValue(db.snaps.targetUrl, url);
-			rec.setValue(db.snaps.via, via);
-			rec.update(conn);
-			
-			snapId.set(rec.getLong(db.snaps.id));
-			
-			writeRequest(request, db, conn, snapId.get());
-		});
+		if (photo != null) {
+			rec.setValue(db.snaps.photo, photo);
+		}
+		
+		rec.update(conn);
+
+		snapId.set(rec.getLong(db.snaps.id));
+
+		writeRequest(request, db, conn, snapId.get());
 		
 		return snapId.get();
+	}
+	
+	public long writeSnap(HttpServletRequest request) throws SQLException, IOException {
+		try (ActiveConnection activeConnection = new ActiveConnection()) {
+			return writeSnap(request, activeConnection);
+		}
 	}
 
 	protected void writeRequest(HttpServletRequest request, Database db, Connection conn, long snapId) {
@@ -88,6 +102,8 @@ public class SnapRequestRecorder {
 	}
 
 	protected void writeHeaders(HttpServletRequest request, Database db, Connection conn, long requestId) {
+		if (request.getHeaderNames() == null) return;
+		
 		for (Enumeration<String> names = request.getHeaderNames(); names.hasMoreElements(); ) {
 			String name = names.nextElement();
 			
@@ -106,6 +122,8 @@ public class SnapRequestRecorder {
 	}
 
 	protected void writeParams(HttpServletRequest request, Database db, Connection conn, long requestId) {
+		if (request.getParameterNames() == null) return;
+		
 		for (Enumeration<String> names = request.getParameterNames(); names.hasMoreElements(); ) {
 			String name = names.nextElement();
 			

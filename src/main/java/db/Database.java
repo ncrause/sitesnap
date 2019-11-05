@@ -16,9 +16,6 @@
  */
 package db;
 
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.util.function.BiConsumer;
 import org.apache.empire.db.DBDatabase;
 
 /**
@@ -40,48 +37,5 @@ public class Database extends DBDatabase {
 		addRelation(requests.apiUserId.referenceOn(apiUsers.id));
 		addRelation(limits.packageId.referenceOn(packages.id));
 	}
-	
-	public static void with(BiConsumer<Database, Connection> func) throws SQLException {
-		Connection c = Connections.get();
-		Database db = Connections.getDatabase();
 
-		db.open(Connections.getDriver(), c);
-
-		try {
-			func.accept(db, c);
-		}
-		finally {
-			db.close(c);
-
-			c.close();
-		}
-	}
-	
-	/**
-	 * Slightly more complex version of <code>with</code>, but this one
-	 * is more specifically tailored to returning values.
-	 * 
-	 * @param <R>
-	 * @param type
-	 * @param func
-	 * @return
-	 * @throws SQLException 
-	 */
-	public static <R> R apply(ConnectionFunction<R> func) throws SQLException {
-		Connection c = Connections.get();
-		Database db = Connections.getDatabase();
-
-		db.open(Connections.getDriver(), c);
-
-		try {
-			return func.apply(db, c);
-		}
-		finally {
-			db.close(c);
-
-			c.close();
-		}
-	}
-	
-	
 }

@@ -52,34 +52,6 @@ public class WicketApplication extends WebApplication {
 			keepOpen = Connections.get();
 		}
 		
-		doMigration();
-	}
-	
-	
-
-	private void doMigration() throws SQLException {
-		FluentConfiguration config = Flyway.configure();
-		
-		config.dataSource(Connections.getDataSource())
-				.placeholders(getPlaceholders());
-		
-		Flyway flyway = config.load();
-		
-		flyway.migrate();
-	}
-	
-	/**
-	 * Builds a Map of default placeholders to be used during migrations
-	 * 
-	 * @return 
-	 */
-	private Map<String, String> getPlaceholders() throws SQLException {
-		Map<String, String> placeholders = new HashMap<>();
-		
-		placeholders.put("blob_type", Connections.getBinaryType());
-		placeholders.put("timestamp_type", Connections.getTimestampType());
-		placeholders.put("network_addr_type", Connections.getNetworkAddressType());
-		
-		return placeholders;
+		Connections.doMigration();
 	}
 }

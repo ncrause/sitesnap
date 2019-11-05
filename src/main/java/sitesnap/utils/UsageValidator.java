@@ -17,14 +17,15 @@
 package sitesnap.utils;
 
 import db.Database;
+import db.beans.ActiveConnection;
 import db.beans.ApiUser;
 import db.beans.Limit;
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import javax.servlet.http.HttpServletRequest;
 import org.apache.empire.db.DBCommand;
-import org.apache.empire.db.DBReader;
 
 /**
  * This class provides a mechanism for querying recent usages of the API,
@@ -46,7 +47,7 @@ public class UsageValidator {
 	
 	private ArrayList<Limit> limits;
 	
-	public ArrayList<Limit> getLimits() throws SQLException {
+	public ArrayList<Limit> getLimits() throws SQLException, IOException {
 		if (limits == null) {
 			limits = user.getPackage().getLimits();
 		}
@@ -54,7 +55,8 @@ public class UsageValidator {
 		return limits;
 	}
 	
-	public ArrayList<Limit> getLimitsByTemporalUnit(String unit) throws SQLException {
+	public ArrayList<Limit> getLimitsByTemporalUnit(String unit) 
+			throws SQLException, IOException {
 		ArrayList<Limit> result = new ArrayList<>();
 		
 		for (Limit limit : getLimits()) {
@@ -66,32 +68,73 @@ public class UsageValidator {
 		return result;
 	}
 	
-	public ArrayList<Limit> getMinuteLimits() throws SQLException {
+	public ArrayList<Limit> getMinuteLimits() 
+			throws SQLException, IOException {
 		return getLimitsByTemporalUnit(Limit.MINUTE);
 	}
 	
-	public ArrayList<Limit> getHourLimits() throws SQLException {
+	public ArrayList<Limit> getHourLimits() throws SQLException, IOException {
 		return getLimitsByTemporalUnit(Limit.HOUR);
 	}
 	
-	public ArrayList<Limit> getDayLimits() throws SQLException {
+	public ArrayList<Limit> getDayLimits() throws SQLException, IOException {
 		return getLimitsByTemporalUnit(Limit.DAY);
 	}
 	
-	public ArrayList<Limit> getMonthLimits() throws SQLException {
+	public ArrayList<Limit> getMonthLimits() throws SQLException, IOException {
 		return getLimitsByTemporalUnit(Limit.MONTH);
 	}
 	
-	public void validatePerMinuteLimits(Database db, Connection conn) throws LimitsExceededException {
-		DBCommand cmd = db.createCommand();
+	public void validatePerMinuteLimits() 
+			throws LimitsExceededException, SQLException, IOException {
+		validateLimits(getMinuteLimits());
+	}
+	
+	public void validatePerHourLimits() 
+			throws LimitsExceededException, SQLException, IOException {
+		validateLimits(getHourLimits());
+	}
+	
+	public void validatePerDayLimits() 
+			throws LimitsExceededException, SQLException, IOException {
+		validateLimits(getDayLimits());
+	}
+	
+	public void validatePerMonthLimits() 
+			throws LimitsExceededException, SQLException, IOException {
+		validateLimits(getMonthLimits());
+	}
+	
+	public void validate() 
+			throws LimitsExceededException, SQLException, IOException {
+		validatePerMinuteLimits();
+		validatePerHourLimits();
+		validatePerDayLimits();
+		validatePerMonthLimits();
+	}
+	
+	private void validateLimits(ArrayList<Limit> limits) 
+			throws LimitsExceededException, SQLException, IOException {
+		try (ActiveConnection activeConnection = new ActiveConnection()) {
+			Database db = activeConnection.getDatabase();
+			Connection conn = activeConnection.getConnection();
+			
+			DBCommand cmd = db.createCommand();
+			for (Limit limit : limits) {
+				cmd.clear();		// always reset the command between iterations
 
-		cmd.select(db.requests.count());
-		cmd.where(db.requests.remoteIp.is(request.getRemoteAddr())
-				.or(db.requests.apiUserId.is(user.getId())),
-				);
-		
-		int count = db.querySingleInt(cmd, 0, conn);
-		
+				cmd.select(db.requests.count());
+				cmd.where(db.requests.remoteIp.is(request.getRemoteAddr())
+						.or(db.requests.apiUserId.is(user.getId())),
+						db.requests.dateCreated.isMoreOrEqual(limit.toTimestamp()));
+
+				long count = db.querySingleLong(cmd, 0, conn);
+
+				if (count > limit.getUsageCap()) {
+					throw new LimitsExceededException();
+				}
+			}
+		}
 	}
 	
 }
