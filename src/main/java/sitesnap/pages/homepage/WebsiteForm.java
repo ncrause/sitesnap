@@ -16,15 +16,11 @@
  */
 package sitesnap.pages.homepage;
 
-import db.Database;
 import java.io.IOException;
-import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.Enumeration;
 import java.util.HashMap;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
-import org.apache.empire.db.DBRecord;
 import org.apache.wicket.markup.html.WebComponent;
 import org.apache.wicket.markup.html.form.DropDownChoice;
 import org.apache.wicket.markup.html.form.Form;
@@ -121,73 +117,5 @@ public class WebsiteForm extends Form {
 	private WebComponent createPlaceholderImage() {
 		return new Image("photograph", new PackageResourceReference(WebsiteForm.class, "camera.svg"));
 	}
-	
-//	private long writeSnap(HttpServletRequest request) throws SQLException {
-//		ThreadLocal<Long> snapId = new ThreadLocal<>();
-//		
-//		Database.with((db, conn) -> {
-//			DBRecord rec = new DBRecord();
-//			
-//			rec.create(db.snaps);
-//			rec.setValue(db.snaps.targetUrl, websiteRequest.getUrl());
-//			rec.setValue(db.snaps.via, "web");
-//			rec.update(conn);
-//			
-//			snapId.set(rec.getLong(db.snaps.id));
-//			
-//			writeRequest(request, db, conn, snapId.get());
-//		});
-//		
-//		return snapId.get();
-//	}
-//
-//	private void writeRequest(HttpServletRequest request, Database db, Connection conn, long snapId) {
-//		DBRecord rec = new DBRecord();
-//		
-//		rec.create(db.requests);
-//		rec.setValue(db.requests.snapId, snapId);
-//		rec.setValue(db.requests.remoteIp, request.getRemoteAddr());
-//		rec.update(conn);
-//			
-//		long requestId = rec.getLong(db.requests.id);
-//		
-//		writeHeaders(request, db, conn, requestId);
-//		writeParams(request, db, conn, requestId);
-//	}
-//
-//	private void writeHeaders(HttpServletRequest request, Database db, Connection conn, long requestId) {
-//		for (Enumeration<String> names = request.getHeaderNames(); names.hasMoreElements(); ) {
-//			String name = names.nextElement();
-//			
-//			for (Enumeration<String> values = request.getHeaders(name); values.hasMoreElements(); ) {
-//				String value = values.nextElement();
-//				DBRecord rec = new DBRecord();
-//
-//				rec.create(db.requestData);
-//				rec.setValue(db.requestData.requestId, requestId);
-//				rec.setValue(db.requestData.type, "header");
-//				rec.setValue(db.requestData.name, name);
-//				rec.setValue(db.requestData.value, value);
-//				rec.update(conn);
-//			}
-//		}
-//	}
-//
-//	private void writeParams(HttpServletRequest request, Database db, Connection conn, long requestId) {
-//		for (Enumeration<String> names = request.getParameterNames(); names.hasMoreElements(); ) {
-//			String name = names.nextElement();
-//			
-//			for (String value : request.getParameterValues(name)) {
-//				DBRecord rec = new DBRecord();
-//
-//				rec.create(db.requestData);
-//				rec.setValue(db.requestData.requestId, requestId);
-//				rec.setValue(db.requestData.type, "parameter");
-//				rec.setValue(db.requestData.name, name);
-//				rec.setValue(db.requestData.value, value);
-//				rec.update(conn);
-//			}
-//		}
-//	}
 	
 }

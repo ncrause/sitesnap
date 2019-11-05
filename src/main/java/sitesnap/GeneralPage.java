@@ -22,6 +22,7 @@ import org.apache.wicket.markup.html.image.Image;
 import org.apache.wicket.markup.html.link.Link;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.request.resource.PackageResourceReference;
+import sitesnap.pages.api.SignupPage;
 import sitesnap.pages.api.UsagePage;
 
 /**
@@ -46,6 +47,12 @@ public abstract class GeneralPage extends WebPage {
 			@Override
 			public void onClick() {
 				setResponsePage(UsagePage.class);
+			}
+		});
+		add(new Link("apiSignupURL") {
+			@Override
+			public void onClick() {
+				setResponsePage(SignupPage.class);
 			}
 		});
 		
