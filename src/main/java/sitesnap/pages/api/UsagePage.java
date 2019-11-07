@@ -41,7 +41,7 @@ public class UsagePage extends GeneralPage implements ApiLimits {
 		add(new Label("perMonth", format(PER_MONTH)));
 	}
 	
-	private static String format(int value) {
+	private static String format(long value) {
 		NumberFormat fmt = NumberFormat.getIntegerInstance();
 		
 		return fmt.format(value);

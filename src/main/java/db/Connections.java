@@ -24,6 +24,7 @@ import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
+import javax.naming.NamingException;
 import javax.sql.DataSource;
 import lombok.extern.java.Log;
 import org.apache.empire.db.DBDatabaseDriver;
@@ -34,6 +35,7 @@ import org.apache.wicket.RuntimeConfigurationType;
 import org.flywaydb.core.Flyway;
 import org.flywaydb.core.api.configuration.FluentConfiguration;
 import org.h2.jdbcx.JdbcDataSource;
+import sitesnap.utils.Jndi;
 
 /**
  * Utility class which provides a data source based on the environment
@@ -90,8 +92,12 @@ public class Connections {
 			return source;
 		}
 		
-		// TODO: in production, we use a JNDI resource
-		return null;
+		try {
+			return (DataSource) Jndi.getEnvironmentContext().lookup("jdbc/Sitesnap");
+		}
+		catch (NamingException ex) {
+			throw new RuntimeException(ex);
+		}
 	}
 	
 	public static Connection get() throws SQLException {
@@ -149,7 +155,7 @@ public class Connections {
 	
 	public static String getTimestampType() throws SQLException {
 		if (getDriver() instanceof DBDatabaseDriverPostgreSQL) {
-			return "timestamp with timezone";
+			return "timestamp with time zone";
 		}
 		else if (getDriver() instanceof DBDatabaseDriverMSSQL) {
 			return "datetime";

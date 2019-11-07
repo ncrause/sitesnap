@@ -25,21 +25,21 @@ package sitesnap;
  */
 public interface ApiLimits {
 	
-	public static final int PER_MINUTE = 10;
+	public static final long PER_MINUTE = 10;
 	
 	/**
 	 * Actually 60 minutes
 	 */
-	public static final int PER_HOUR = 500;
+	public static final long PER_HOUR = 500;
 	
 	/**
 	 * Actually 24 hours
 	 */
-	public static final int PER_DAY = 10000;
+	public static final long PER_DAY = 10000;
 	
 	/**
 	 * Actually 30 days
 	 */
-	public static final int PER_MONTH = 250000;
+	public static final long PER_MONTH = 250000;
 	
 }

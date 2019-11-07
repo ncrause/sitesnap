@@ -3,15 +3,10 @@ package sitesnap;
 import sitesnap.pages.HomePage;
 import org.apache.wicket.markup.html.WebPage;
 import org.apache.wicket.protocol.http.WebApplication;
-import org.flywaydb.core.Flyway;
 import db.Connections;
 import java.sql.Connection;
-import java.sql.SQLException;
-import java.util.HashMap;
-import java.util.Map;
 import lombok.SneakyThrows;
 import org.apache.wicket.RuntimeConfigurationType;
-import org.flywaydb.core.api.configuration.FluentConfiguration;
 
 /**
  * Application object for your web application. If you want to run this

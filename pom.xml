@@ -23,7 +23,7 @@
 	<groupId>ncrause</groupId>
 	<artifactId>SiteSnap</artifactId>
 	<packaging>war</packaging>
-	<version>0.1</version>
+	<version>1.0</version>
 		<!-- TODO project name  -->
 	<name>SiteSnap</name>
 	<description></description>
@@ -220,6 +220,7 @@
 				</configuration>
 			</plugin>
 		</plugins>
+		<finalName>sitesnap</finalName>
 	</build>
 
 	<repositories>
