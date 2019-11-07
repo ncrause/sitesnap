@@ -27,12 +27,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 			
 			<p>
 				SiteSnap provides a free API for invoking website photographs.
-				When invoked, it returns either a lossless PNG file, or a
-				response structure in JSON. You can tell which has been
-				returned by either inspecting the <code>Content-Type</code>
-				header, or by the HTTP status code - <code>200</code> will
-				<strong>always</strong> only be returned if a successful
-				photograph was taken.
+				When invoked successfully, it returns a lossless PNG 
+				file. Any error condition is represented by an HTTP status
+				code.
 			</p>
 			
 			<h2>Limits</h2>
@@ -66,7 +63,65 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 			
 			<h3>Errors</h3>
 			
+			<ul>
+				<li>401 - May be caused by one of the following:
+					<ol>
+						<li>HTTP Authentication header wasn't supplied correctly</li>
+						<li>Unable to locate the supplied email address (user)</li>
+						<li>If the password was incorrect</li>
+					</ol>
+				</li>
+				<li>417 - May be caused by one of the following:
+					<ol>
+						<li>if the authentication tokens couldn't be extracted (for example if you are using a method other than "basic" authentication)</li>
+						<li>if you are missing one of the required parameters</li>
+					</ol>
+				</li>
+				<li>403 - if you have exceeded the usage limits</li>
+				<li>400 - if one of the parameter supplied is malformed</li>
+			</ul>
+			
 			<h3>End-Point</h3>
+			
+			<h4>Photograph</h4>
+			
+			<p>Take photograph of the supplied website, and returns a PNG</p>
+			<p>URL: /api/photograph</p>
+			<p>Method: GET or POST</p>
+			<label>Parameters</label>
+			<div class="table-responsive">
+				<table class="table table-striped">
+					<thead>
+						<tr>
+							<th>Parameter</th>
+							<th>Type</th>
+							<th>Description</th>
+						</tr>
+					</thead>
+					
+					<tbody>
+						<tr>
+							<td>width</td>
+							<td>integer</td>
+							<td>The width, in pixels, of the virtual monitor to be used during rendering.</td>
+						</tr>
+						
+						<tr>
+							<td>height</td>
+							<td>integer</td>
+							<td>The height, in pixels, of the virtual monitor to be used during rendering.</td>
+						</tr>
+						
+						<tr>
+							<td>url</td>
+							<td>string</td>
+							<td>The remote website's URL to photograph.</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			<label>Example Request:</label>
+			<pre class="border border-dark p-2"><code>curl -i -u email@address.tld:password -X GET "http://sitesnap.ca/api/photograph?width=1024&height=768&url=https://google.ca"</code></pre>
 		</wicket:extend>
 	</body>
 </html>

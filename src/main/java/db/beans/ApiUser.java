@@ -16,6 +16,7 @@
  */
 package db.beans;
 
+import db.ApiUsers;
 import db.Database;
 import java.io.IOException;
 import java.io.Serializable;
@@ -27,6 +28,8 @@ import lombok.Data;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.empire.db.DBCommand;
 import org.apache.empire.db.DBReader;
+import org.apache.empire.db.DBRecord;
+import org.apache.empire.db.DBRowSet;
 
 /**
  *
@@ -37,13 +40,13 @@ public class ApiUser implements Serializable {
 	
 	private static final long serialVersionUID = -777L;
 	
-	private long id;
+	private Long id;
 	
 	private String emailAddress;
 	
 	private String passwordHash;
 	
-	private long packageId;
+	private Long packageId;
 	
 	private Timestamp dateCreated;
 	
@@ -55,6 +58,32 @@ public class ApiUser implements Serializable {
 	
 	public Package getPackage() throws SQLException, IOException {
 		return Package.find(packageId);
+	}
+	
+	public ApiUser save(ActiveConnection activeConnection) {
+		DBRecord rec = new DBRecord();
+		ApiUsers table = activeConnection.getDatabase().apiUsers;
+		
+		if (id == null) {
+			rec.create(table);
+		}
+		else {
+			rec.read(table, id, activeConnection.getConnection());
+		}
+		
+		rec.setValue(table.emailAddress, emailAddress);
+		rec.setValue(table.passwordHash, passwordHash);
+		rec.setValue(table.packageId, packageId);
+		
+		rec.update(activeConnection.getConnection());
+		
+		return this;
+	}
+	
+	public ApiUser save() throws SQLException, IOException {
+		try (ActiveConnection activeConnection = new ActiveConnection()) {
+			return save(activeConnection);
+		}
 	}
 	
 	public static ApiUser find(String emailAddress, ActiveConnection activeConnection) {

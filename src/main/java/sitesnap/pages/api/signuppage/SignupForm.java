@@ -16,9 +16,17 @@
  */
 package sitesnap.pages.api.signuppage;
 
+import db.beans.ActiveConnection;
+import db.beans.ApiUser;
+import java.io.IOException;
+import java.sql.SQLException;
+import java.util.UUID;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.mail.MessagingException;
 import lombok.extern.java.Log;
+import org.apache.commons.codec.digest.DigestUtils;
+import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.CheckBox;
 import org.apache.wicket.markup.html.form.EmailTextField;
 import org.apache.wicket.markup.html.form.Form;
@@ -49,16 +57,40 @@ public class SignupForm extends Form {
 
 	@Override
 	protected void onSubmit() {
-		try {
-			Mailer.configure((m) -> {
-				m.setFrom("root@localhost")
-						.setRecipient(signupRequest.getEmailAddress())
-						.setContent("Your API Key: ");
-			}).send();
-		}
-		catch (MessagingException ex) {
+		// although it looks a little off, we need a double "try" block like
+		// this so we can explicitly rollback if the mailer fails.
+		try (ActiveConnection activeConnection = new ActiveConnection()) {
+			try {
+				String password = UUID.randomUUID().toString();
+				ApiUser user = new ApiUser();
+
+				user.setEmailAddress(signupRequest.getEmailAddress());
+				user.setPasswordHash(DigestUtils.sha256Hex(password));
+				user.setPackageId(db.beans.Package.findByName("Free", activeConnection).getId());
+
+				user.save(activeConnection);
+
+				Mailer.configure((m) -> {
+					m.setFrom("root@localhost")
+							.setRecipient(signupRequest.getEmailAddress())
+							.setSubject("SiteSnap API Key")
+							.setContent("Your API Key: " + password);
+				}).send();
+
+				// only commit the change 
+				activeConnection.getDatabase().commit(activeConnection.getConnection());
+
+				getPage().replace(new Label("success", "Your API key has been emailed."));
+			}
+			// setRecipient above will throw a runtime exception, so catch it
+			catch (RuntimeException | MessagingException ex) {
+				activeConnection.getDatabase().rollback(activeConnection.getConnection());
+				log.log(Level.SEVERE, null, ex);
+				getPage().replace(new Label("error", ex.getMessage()));
+			}
+		} catch (SQLException | IOException ex) {
 			log.log(Level.SEVERE, null, ex);
-			// TODO: make some sort of feedback area
+			throw new RuntimeException(ex);
 		}
 	}
 

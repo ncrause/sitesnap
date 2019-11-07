@@ -52,6 +52,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 			</nav>
 		</header>
 		
+		<section id="messages" class="container">
+			<div class="alert alert-danger my-4" role="alert" wicket:id="error">[error message here]</div>
+			<div class="alert alert-success my-4" role="alert" wicket:id="success">[success message here]</div>
+		</section>
+		
 		<main id="body-content" class="container py-4">
 			<wicket:child />
 		</main>

@@ -18,6 +18,7 @@ package sitesnap;
 
 import sitesnap.pages.HomePage;
 import org.apache.wicket.markup.html.WebPage;
+import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.image.Image;
 import org.apache.wicket.markup.html.link.Link;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
@@ -37,6 +38,16 @@ public abstract class GeneralPage extends WebPage {
 	public GeneralPage(final PageParameters parameters) {
 		super(parameters);
 		
+		init();
+	}
+	
+	private void init() {
+		addMenuItems();
+		addContentItems();
+		addFooterItems();
+	}
+
+	private void addMenuItems() {
 		add(new Link("homeURL") {
 			@Override
 			public void onClick() {
@@ -55,8 +66,23 @@ public abstract class GeneralPage extends WebPage {
 				setResponsePage(SignupPage.class);
 			}
 		});
+	}
+	
+	private void addContentItems() {
+		Label error = new Label("error");
 		
-		// footer items
+		error.setVisible(false);
+		
+		add(error);
+		
+		Label success = new Label("success");
+		
+		success.setVisible(false);
+		
+		add(success);
+	}
+	
+	private void addFooterItems() {
 		add(new Image("wicketLogo", new PackageResourceReference(GeneralPage.class, "Apache-Wicket.svg")));
 		add(new Image("empiredbLogo", new PackageResourceReference(GeneralPage.class, "empiredb.svg")));
 	}

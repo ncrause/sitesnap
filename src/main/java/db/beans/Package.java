@@ -76,4 +76,34 @@ public class Package implements Serializable {
 		}
 	}
 	
+	public static Package findByName(String name, ActiveConnection activeConnection) {
+		Database db = activeConnection.getDatabase();
+		Connection conn = activeConnection.getConnection();
+		DBCommand cmd = db.createCommand();
+		DBReader reader = new DBReader();
+
+		cmd.select(db.packages.getColumns());
+		cmd.where(db.packages.name.is(name));
+		reader.open(cmd, conn);
+
+		try {
+			ArrayList<Package> packages = reader.getBeanList(Package.class, 1);
+
+			if (packages.size() > 0) {
+				return packages.get(0);
+			}
+		}
+		finally {
+			reader.close();
+		}
+		
+		return null;
+	}
+	
+	public static Package findByName(String name) throws SQLException, IOException {
+		try (ActiveConnection activeConnection = new ActiveConnection()) {
+			return findByName(name, activeConnection);
+		}
+	}
+	
 }

@@ -47,11 +47,11 @@
         <servlet-name>PhotographServlet</servlet-name>
         <url-pattern>/api/photograph</url-pattern>
     </servlet-mapping>
-    <resource-ref>
+    <!-- <resource-ref>
         <description>Resource reference to a mail session factory.</description>
         <res-ref-name>mail/Session</res-ref-name>
         <res-type>javax.mail.Session</res-type>
         <res-auth>Container</res-auth>
         <res-sharing-scope>Shareable</res-sharing-scope>
-    </resource-ref>
+    </resource-ref> -->
 </web-app>
