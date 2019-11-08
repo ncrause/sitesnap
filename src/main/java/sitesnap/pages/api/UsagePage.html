@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<!--
+Copyright (C) 2019 Nathan Crause <nathan@crause.name>
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+-->
+
+<html>
+	<head>
+		<meta charset="UTF-8">
+	</head>
+	
+	<body>
+		<wicket:extend>
+			<h1>API Usage</h1>
+			
+			<p>
+				SiteSnap provides a free API for invoking website photographs.
+				When invoked successfully, it returns a lossless PNG 
+				file. Any error condition is represented by an HTTP status
+				code.
+			</p>
+			
+			<h2>Limits</h2>
+			
+			<p>
+				<strong>Please be aware</strong> that these usage limits may be
+				amended from time to time depending on potential misuse/abuse.
+			</p>
+			
+			<p>
+				Each limit below is applied per API key, as well as per IP.
+			</p>
+			
+			<ul>
+				<li><span wicket:id="perMinute">[PER MINUTE]</span> per minute</li>
+				<li><span wicket:id="perHour">[PER HOUR]</span> per hour</li>
+				<li><span wicket:id="perDay">[PER DAY]</span> per 24-hours</li>
+				<li><span wicket:id="perMonth">[PER MONTH]</span> per 30-days</li>
+			</ul>
+			
+			<h2>Making a Call</h2>
+			
+			<h3>Authentication</h3>
+			
+			<p>
+				Each request must be accompanied by an HTTP authorization
+				header: <code>Authorization: Basic bmF0aGFuQGNyYXVzZS5uYW1lOmFwaS1rZXk=</code>
+				where the username is your e-mail address, and the password
+				is your assigned API key.
+			</p>
+			
+			<h3>Errors</h3>
+			
+			<ul>
+				<li>401 - May be caused by one of the following:
+					<ol>
+						<li>HTTP Authentication header wasn't supplied correctly</li>
+						<li>Unable to locate the supplied email address (user)</li>
+						<li>If the password was incorrect</li>
+					</ol>
+				</li>
+				<li>417 - May be caused by one of the following:
+					<ol>
+						<li>if the authentication tokens couldn't be extracted (for example if you are using a method other than "basic" authentication)</li>
+						<li>if you are missing one of the required parameters</li>
+					</ol>
+				</li>
+				<li>403 - if you have exceeded the usage limits</li>
+				<li>400 - if one of the parameter supplied is malformed</li>
+			</ul>
+			
+			<h3>End-Point</h3>
+			
+			<h4>Photograph</h4>
+			
+			<p>Take photograph of the supplied website, and returns a PNG</p>
+			<p>URL: /api/photograph</p>
+			<p>Method: GET or POST</p>
+			<label>Parameters</label>
+			<div class="table-responsive">
+				<table class="table table-striped">
+					<thead>
+						<tr>
+							<th>Parameter</th>
+							<th>Type</th>
+							<th>Description</th>
+						</tr>
+					</thead>
+					
+					<tbody>
+						<tr>
+							<td>width</td>
+							<td>integer</td>
+							<td>The width, in pixels, of the virtual monitor to be used during rendering.</td>
+						</tr>
+						
+						<tr>
+							<td>height</td>
+							<td>integer</td>
+							<td>The height, in pixels, of the virtual monitor to be used during rendering.</td>
+						</tr>
+						
+						<tr>
+							<td>url</td>
+							<td>string</td>
+							<td>The remote website's URL to photograph.</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			<label>Example Request:</label>
+			<pre class="border border-dark p-2"><code>curl -i -u email@address.tld:password -X GET "http://sitesnap.ca/api/photograph?width=1024&height=768&url=https://google.ca"</code></pre>
+		</wicket:extend>
+	</body>
+</html>
